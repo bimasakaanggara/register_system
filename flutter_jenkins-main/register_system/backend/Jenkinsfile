@@ -67,4 +67,10 @@ pipeline {
             echo '❌ Build APK gagal!'
         }
     }
+
+    stage('TEST') {
+    steps {
+        sh 'echo JENKINSFILE TERBACA'
+    }
+}
 }
