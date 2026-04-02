@@ -12,20 +12,22 @@ pipeline {
 
     stages {
 
-        stage('Debug Info') {
+        stage('Debug Workspace') {
             steps {
-                sh 'whoami'
                 sh 'pwd'
                 sh 'ls -la'
-                sh 'echo $PATH'
-                sh 'echo $ANDROID_HOME'
-                sh 'ls -l /var/lib/jenkins/flutter/bin/flutter'
             }
         }
 
-        stage('Check Folder Structure') {
+        stage('Check Folder') {
             steps {
                 sh 'ls -R'
+            }
+        }
+
+        stage('Check Flutter Project') {
+            steps {
+                sh 'ls flutter_jenkins-main/register_system/backend/flutter_app'
             }
         }
 
@@ -35,25 +37,11 @@ pipeline {
             }
         }
 
-        stage('Clean Project') {
+        stage('Build Flutter APK') {
             steps {
-                dir('flutter_jenkins-main/backend/flutter_app') {
+                dir('flutter_jenkins-main/register_system/backend/flutter_app') {
                     sh 'flutter clean'
-                }
-            }
-        }
-
-        stage('Get Dependencies') {
-            steps {
-                dir('flutter_jenkins-main/backend/flutter_app') {
                     sh 'flutter pub get'
-                }
-            }
-        }
-
-        stage('Build APK') {
-            steps {
-                dir('flutter_jenkins-main/backend/flutter_app') {
                     sh 'flutter build apk --release'
                 }
             }
@@ -61,13 +49,13 @@ pipeline {
 
         stage('Archive APK') {
             steps {
-                archiveArtifacts artifacts: 'flutter_jenkins-main/backend/flutter_app/build/app/outputs/flutter-apk/*.apk', fingerprint: true
+                archiveArtifacts artifacts: 'flutter_jenkins-main/register_system/backend/flutter_app/build/app/outputs/flutter-apk/*.apk', fingerprint: true
             }
         }
 
         stage('TEST') {
             steps {
-                sh 'echo JENKINSFILE TERBACA ✅'
+                sh 'echo BUILD SELESAI ✅'
             }
         }
     }

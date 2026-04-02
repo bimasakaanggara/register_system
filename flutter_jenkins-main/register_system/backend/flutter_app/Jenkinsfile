@@ -5,33 +5,67 @@ pipeline {
         JAVA_HOME = "/usr/lib/jvm/java-17-openjdk-amd64"
         ANDROID_HOME = "/var/lib/jenkins/Android/Sdk"
         ANDROID_SDK_ROOT = "/var/lib/jenkins/Android/Sdk"
-        PATH = "${env.PATH}:${JAVA_HOME}/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/latest/bin"
+        FLUTTER_HOME = "/var/lib/jenkins/flutter"
+
+        PATH = "${FLUTTER_HOME}/bin:${JAVA_HOME}/bin:${ANDROID_HOME}/platform-tools:${ANDROID_HOME}/cmdline-tools/latest/bin:${env.PATH}"
     }
 
     stages {
 
-        stage('Checkout Repo') {
+        stage('Debug Workspace') {
             steps {
-                git 'https://github.com/Aqshalikhsan/Flutter-FastAPI-SQLiteBase.git'
+                sh 'pwd'
+                sh 'ls -la'
             }
         }
 
-        stage('Build Flutter') {
+        stage('Check Folder') {
             steps {
-                dir('register_system/backend/flutter_app') {
+                sh 'ls -R'
+            }
+        }
 
+        stage('Check Flutter Project') {
+            steps {
+                sh 'ls flutter_jenkins-main/register_system/backend/flutter_app'
+            }
+        }
+
+        stage('Flutter Doctor') {
+            steps {
+                sh 'flutter doctor -v'
+            }
+        }
+
+        stage('Build Flutter APK') {
+            steps {
+                dir('flutter_jenkins-main/register_system/backend/flutter_app') {
                     sh 'flutter clean'
                     sh 'flutter pub get'
                     sh 'flutter build apk --release'
-
                 }
             }
         }
 
         stage('Archive APK') {
             steps {
-                archiveArtifacts artifacts: 'register_system/backend/flutter_app/build/app/outputs/flutter-apk/*.apk'
+                archiveArtifacts artifacts: 'flutter_jenkins-main/register_system/backend/flutter_app/build/app/outputs/flutter-apk/*.apk', fingerprint: true
             }
+        }
+
+        stage('TEST') {
+            steps {
+                sh 'echo BUILD SELESAI ✅'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Build APK berhasil!'
+        }
+        failure {
+            echo '❌ Build APK gagal!'
         }
     }
 }
