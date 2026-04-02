@@ -18,50 +18,56 @@ pipeline {
                 sh 'pwd'
                 sh 'ls -la'
                 sh 'echo $PATH'
+                sh 'echo $ANDROID_HOME'
                 sh 'ls -l /var/lib/jenkins/flutter/bin/flutter'
+            }
+        }
+
+        stage('Check Folder Structure') {
+            steps {
+                sh 'ls -R'
             }
         }
 
         stage('Flutter Doctor') {
             steps {
-                sh '/var/lib/jenkins/flutter/bin/flutter doctor'
+                sh 'flutter doctor -v'
             }
         }
 
         stage('Clean Project') {
             steps {
-                dir('register_system/backend/flutter_app') {
-                    sh '/var/lib/jenkins/flutter/bin/flutter clean'
+                dir('flutter_jenkins-main/backend/flutter_app') {
+                    sh 'flutter clean'
                 }
             }
         }
 
         stage('Get Dependencies') {
             steps {
-                dir('register_system/backend/flutter_app') {
-                    sh '/var/lib/jenkins/flutter/bin/flutter pub get'
+                dir('flutter_jenkins-main/backend/flutter_app') {
+                    sh 'flutter pub get'
                 }
             }
         }
 
         stage('Build APK') {
             steps {
-                dir('register_system/backend/flutter_app') {
-                    sh '/var/lib/jenkins/flutter/bin/flutter build apk --release'
+                dir('flutter_jenkins-main/backend/flutter_app') {
+                    sh 'flutter build apk --release'
                 }
             }
         }
 
         stage('Archive APK') {
             steps {
-                archiveArtifacts artifacts: 'register_system/backend/flutter_app/build/app/outputs/flutter-apk/*.apk', fingerprint: true
+                archiveArtifacts artifacts: 'flutter_jenkins-main/backend/flutter_app/build/app/outputs/flutter-apk/*.apk', fingerprint: true
             }
         }
 
-        // ✅ PINDAHKAN KE SINI
         stage('TEST') {
             steps {
-                sh 'echo JENKINSFILE TERBACA'
+                sh 'echo JENKINSFILE TERBACA ✅'
             }
         }
     }
